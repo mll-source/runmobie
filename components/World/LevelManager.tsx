@@ -43,7 +43,7 @@ const SHOP_BACK_GEO = new THREE.BoxGeometry(1, 5, 1.2); // Will be scaled
 const SHOP_OUTLINE_GEO = new THREE.BoxGeometry(1, 7.2, 0.8); // Will be scaled
 const SHOP_FLOOR_GEO = new THREE.PlaneGeometry(1, 4); // Will be scaled
 
-const PARTICLE_COUNT = 600;
+const PARTICLE_COUNT = 300; // Reduced for mobile
 const BASE_LETTER_INTERVAL = 150; 
 
 const getLetterInterval = (level: number) => {

@@ -113,7 +113,8 @@ export const HUD: React.FC = () => {
 
   // Virtual Key Dispatcher
   const dispatchKey = (key: string) => {
-    window.dispatchEvent(new KeyboardEvent('keydown', { key }));
+    // Dispatch bubbled event for React compatibility if needed, though window listeners usually catch it
+    window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
   };
 
   if (status === GameStatus.SHOP) {
@@ -243,7 +244,7 @@ export const HUD: React.FC = () => {
                 <div className="text-3xl md:text-5xl font-bold text-cyan-400 drop-shadow-[0_0_10px_#00ffff] font-cyber">
                     {score.toLocaleString()}
                 </div>
-                {/* Speed Indicator - Moved to under score for better layout with virtual controls */}
+                {/* Speed Indicator */}
                  <div className="flex items-center space-x-2 text-cyan-500 opacity-70 mt-1">
                      <Zap className="w-3 h-3 md:w-4 md:h-4 animate-pulse" />
                      <span className="font-mono text-sm md:text-base">SPEED {Math.round((speed / RUN_SPEED_BASE) * 100)}%</span>
@@ -261,7 +262,7 @@ export const HUD: React.FC = () => {
         </div>
         
         {/* Level Indicator - Top Center */}
-        <div className="absolute top-5 left-1/2 transform -translate-x-1/2 text-sm md:text-lg text-purple-300 font-bold tracking-wider font-mono bg-black/50 px-3 py-1 rounded-full border border-purple-500/30 backdrop-blur-sm z-50">
+        <div className="absolute top-5 left-1/2 transform -translate-x-1/2 text-sm md:text-lg text-purple-300 font-bold tracking-wider font-mono bg-black/50 px-3 py-1 rounded-full border border-purple-500/30 backdrop-blur-sm z-50 pointer-events-none">
             LEVEL {level} <span className="text-gray-500 text-xs md:text-sm">/ 3</span>
         </div>
 
@@ -273,7 +274,7 @@ export const HUD: React.FC = () => {
         )}
 
         {/* Gemini Collection Status - Just below Top Bar */}
-        <div className="absolute top-16 md:top-24 left-1/2 transform -translate-x-1/2 flex space-x-2 md:space-x-3">
+        <div className="absolute top-16 md:top-24 left-1/2 transform -translate-x-1/2 flex space-x-2 md:space-x-3 pointer-events-none">
             {target.map((char, idx) => {
                 const isCollected = collectedLetters.includes(idx);
                 const color = GEMINI_COLORS[idx];
@@ -296,40 +297,48 @@ export const HUD: React.FC = () => {
             })}
         </div>
 
-        {/* Mobile Virtual Controls Overlay - Bottom Area */}
-        <div className="absolute bottom-8 left-0 w-full flex justify-between px-6 pointer-events-auto pb-safe">
+        {/* Mobile Virtual Controls Overlay */}
+        <div className="absolute bottom-0 left-0 w-full flex justify-between items-end px-6 py-6 pb-8 md:pb-10 pointer-events-none z-[60]">
             {/* Movement Controls (Left/Right) */}
-            <div className="flex gap-4">
+            <div className="flex gap-4 pointer-events-auto">
                  <button
-                    className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center active:bg-cyan-500/40 active:border-cyan-400 transition-all active:scale-95"
+                    className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center active:bg-cyan-500/40 active:border-cyan-400 transition-all active:scale-95 touch-none select-none shadow-lg"
                     onPointerDown={(e) => { e.preventDefault(); dispatchKey('ArrowLeft'); }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    aria-label="Move Left"
                  >
                      <ArrowLeft className="w-8 h-8 text-white" />
                  </button>
                  <button
-                    className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center active:bg-cyan-500/40 active:border-cyan-400 transition-all active:scale-95"
+                    className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center active:bg-cyan-500/40 active:border-cyan-400 transition-all active:scale-95 touch-none select-none shadow-lg"
                     onPointerDown={(e) => { e.preventDefault(); dispatchKey('ArrowRight'); }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    aria-label="Move Right"
                  >
                      <ArrowRight className="w-8 h-8 text-white" />
                  </button>
             </div>
 
             {/* Action Controls (Ability/Jump) */}
-            <div className="flex gap-4 items-end">
+            <div className="flex gap-4 items-end pointer-events-auto">
                  {/* Ability Button (Only visible if unlocked) */}
                  {hasImmortality && (
                      <button
-                        className={`w-12 h-12 rounded-full backdrop-blur-md border flex items-center justify-center transition-all active:scale-95 ${isImmortalityActive ? 'bg-yellow-500/50 border-yellow-400' : 'bg-white/10 border-white/20 active:bg-yellow-500/40'}`}
+                        className={`w-14 h-14 rounded-full backdrop-blur-md border flex items-center justify-center transition-all active:scale-95 touch-none select-none shadow-lg ${isImmortalityActive ? 'bg-yellow-500/50 border-yellow-400' : 'bg-white/10 border-white/20 active:bg-yellow-500/40'}`}
                         onPointerDown={(e) => { e.preventDefault(); dispatchKey(' '); }}
+                        onContextMenu={(e) => e.preventDefault()}
+                        aria-label="Activate Ability"
                      >
-                         <Shield className={`w-6 h-6 ${isImmortalityActive ? 'text-white' : 'text-yellow-400'}`} />
+                         <Shield className={`w-7 h-7 ${isImmortalityActive ? 'text-white' : 'text-yellow-400'}`} />
                      </button>
                  )}
 
                  {/* Jump Button */}
                  <button
-                    className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border-2 border-white/30 flex items-center justify-center active:bg-purple-500/40 active:border-purple-400 transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)] active:scale-95"
+                    className="w-20 h-20 rounded-full bg-cyan-600/20 backdrop-blur-md border-2 border-cyan-400/50 flex items-center justify-center active:bg-cyan-500/40 active:border-cyan-400 transition-all shadow-[0_0_20px_rgba(0,255,255,0.4)] active:scale-95 touch-none select-none"
                     onPointerDown={(e) => { e.preventDefault(); dispatchKey('ArrowUp'); }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    aria-label="Jump"
                  >
                      <ArrowUp className="w-10 h-10 text-white" />
                  </button>

@@ -12,7 +12,7 @@ import { LANE_WIDTH } from '../../types';
 
 const StarField: React.FC = () => {
   const speed = useStore(state => state.speed);
-  const count = 3000; // Increased star count for better density
+  const count = 1500; // Optimized star count for mobile performance
   const meshRef = useRef<THREE.Points>(null);
   
   const positions = useMemo(() => {
